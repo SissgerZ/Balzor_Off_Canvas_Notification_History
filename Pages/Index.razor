@@ -2,8 +2,28 @@
 
 <PageTitle>Index</PageTitle>
 
-<h1>Hello, world!</h1>
+<p> Index page content is shown </p>
 
-Welcome to your new app.
+<Button Type="ButtonType.Button" Color="ButtonColor.Primary" @onclick="SaveEmployee">
+    Test
+</Button>
 
-<SurveyPrompt Title="How is Blazor working for you?" />
+@code {
+
+    [Inject] protected ToastService ToastService { get; set; } = default!;
+
+    private void SaveEmployee()
+    {
+        try
+        {
+            // TODO: call the service/api to save the employee details            
+            ToastService.Notify(new ToastMessage(ToastType.Success, $"Employee details saved successfully."));
+        }
+        catch (Exception ex)
+        {
+            // handle exception
+
+            ToastService.Notify(new(ToastType.Danger, $"Error: {ex.Message}."));
+        }
+    }
+}
