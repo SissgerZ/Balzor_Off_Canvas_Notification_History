@@ -16,8 +16,24 @@
     {
         try
         {
-            // TODO: call the service/api to save the employee details            
-            ToastService.Notify(new ToastMessage(ToastType.Success, $"Employee details saved successfully."));
+                             
+            ToastService.Notify(new ToastMessage(type: ToastType.Success, 
+                                                 title: "Something happend", 
+                                                 message: $"Employee details saved successfully with a very long message.", 
+                                                 iconName: IconName.CheckCircleFill,
+                                                 helpText: DateTime.UtcNow.ToString()));
+
+            ToastService.Notify(new ToastMessage(type: ToastType.Warning,
+                                                 title: "Something happend",
+                                                 message: $"Employee details saved successfully with a very long message.",
+                                                 iconName: IconName.LightbulbFill,
+                                                 helpText: DateTime.UtcNow.ToString()));
+
+            ToastService.Notify(new ToastMessage(type: ToastType.Danger,
+                                                 title: "Something happend",
+                                                 message: $"Employee details saved successfully with a very long message.",
+                                                 iconName: IconName.ExclamationTriangleFill,
+                                                 helpText: DateTime.UtcNow.ToString()));
         }
         catch (Exception ex)
         {
