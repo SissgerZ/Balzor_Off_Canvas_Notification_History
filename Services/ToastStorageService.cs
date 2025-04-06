@@ -13,31 +13,32 @@ public class ToastStorageService
         _jsRuntime = jsRuntime;
     }
 
-    public async Task SaveToastMessage(TimedToastMessage message)
+    public async Task SaveToastMessage(TimedToastMessage timedToastMessage)
     {
-        if (message == null)
+        if (timedToastMessage == null)
             return;
 
-        if (message.Id == Guid.Empty)
+        if (timedToastMessage.Id == Guid.Empty)
             return;
 
-        var json = JsonSerializer.Serialize(message, new JsonSerializerOptions { PropertyNamingPolicy = JsonNamingPolicy.CamelCase });
+        var jsonSerializerOptions = new JsonSerializerOptions
+        {
+            PropertyNamingPolicy = JsonNamingPolicy.CamelCase
+        };
 
-        await _jsRuntime.InvokeVoidAsync("indexedDBHelper.saveMessage", JsonSerializer.Deserialize<object>(json));
+        var serializedMessage = JsonSerializer.Serialize(timedToastMessage, jsonSerializerOptions);
+
+        await _jsRuntime.InvokeVoidAsync("indexedDBHelper.saveMessage", JsonSerializer.Deserialize<object>(serializedMessage));
     }
 
     public async Task<List<TimedToastMessage>> LoadToastMessages()
     {
-        return await _jsRuntime.InvokeAsync<List<TimedToastMessage>>("indexedDBHelper.loadMessages") ?? [];
+        var toastMessages = await _jsRuntime.InvokeAsync<List<TimedToastMessage>>("indexedDBHelper.loadMessages") ?? [];
+
+        return toastMessages;
     }
 
-    public async Task RemoveAllToastMessages()
-    {
-        await _jsRuntime.InvokeVoidAsync("indexedDBHelper.removeAllMessages");
-    }
+    public async Task RemoveAllToastMessages() => await _jsRuntime.InvokeVoidAsync("indexedDBHelper.removeAllMessages");
 
-    public async Task RemoveToastMessage(Guid messageId)
-    {
-        await _jsRuntime.InvokeVoidAsync("indexedDBHelper.removeMessageById", messageId);
-    }
+    public async Task RemoveToastMessage(Guid messageId) => await _jsRuntime.InvokeVoidAsync("indexedDBHelper.removeMessageById", messageId);
 }

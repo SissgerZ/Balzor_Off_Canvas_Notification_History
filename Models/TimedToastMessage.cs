@@ -10,9 +10,9 @@ public class TimedToastMessage : ToastMessage
 
     public IconColor IconColor { get; set; }
 
-    public new Guid Id { get; set; }
+    public Guid Id { get; set; }
 
-    // pevent serialization issues with json ignore
+    // prevent serialization issues with json ignore
     [JsonIgnore]
     public new RenderFragment? Content { get; set; }
 

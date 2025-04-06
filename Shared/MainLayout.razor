@@ -6,12 +6,16 @@
 
 <style>
     .offcanvas-header {
-    display: unset;
-    padding: unset;
+        display: unset;
+        padding: unset;
     }
 
     .offcanvas-body {
-    padding: unset;
+        padding: unset;
+    }
+
+    .progress {
+        display: none;
     }
 </style>
 
@@ -23,18 +27,18 @@
                 @if (TimedToastMessages.Count() > 0 && TimedToastMessages.Count() < 100)
                 {
                     <Badge Color="BadgeColor.Danger"
-                    Position="Position.Absolute"
-                    Placement="BadgePlacement.TopRight"
-                    IndicatorType="BadgeIndicatorType.RoundedPill"
-                    VisuallyHiddenText="unread messages">@TimedToastMessages.Count()</Badge>
+                           Position="Position.Absolute"
+                           Placement="BadgePlacement.TopRight"
+                           IndicatorType="BadgeIndicatorType.RoundedPill"
+                           VisuallyHiddenText="unread messages">@TimedToastMessages.Count()</Badge>
                 }
                 else if (TimedToastMessages.Count() >= 100)
                 {
                     <Badge Color="BadgeColor.Danger"
-                    Position="Position.Absolute"
-                    Placement="BadgePlacement.TopRight"
-                    IndicatorType="BadgeIndicatorType.RoundedPill"
-                    VisuallyHiddenText="unread messages">99+</Badge>
+                           Position="Position.Absolute"
+                           Placement="BadgePlacement.TopRight"
+                           IndicatorType="BadgeIndicatorType.RoundedPill"
+                           VisuallyHiddenText="unread messages">99+</Badge>
                 }
             </Button>
 
@@ -67,7 +71,7 @@
                     {
                         <div class="row align-items-center pt-1">
                             <div class="col">
-                                <small style="color: dimgrey;">@timedToastMessage.Occurrence</small>
+                                <small style="color: dimgray;">@timedToastMessage.Occurrence</small>
                             </div>
                             <div class="col text-end">
                                 <Button Color="ButtonColor.Dark" @onclick="@(async () => await OnDismissSingleToastAsync(timedToastMessage))">
@@ -124,35 +128,28 @@
 
     private Offcanvas offcanvas = default!;
 
-    private async Task OnShowOffcanvasClick() => await offcanvas.ShowAsync();
-
-    protected override void OnInitialized()
-    {
-        var toastServiceType = typeof(ToastService);
-
-        var eventInfo = toastServiceType.GetEvent("OnNotify", BindingFlags.NonPublic | BindingFlags.Instance);
-
-        if (eventInfo != null)
-        {
-            var methodInfo = GetType().GetMethod(nameof(OnNotifyHandler), BindingFlags.NonPublic | BindingFlags.Instance);
-
-            if (methodInfo != null)
-            {
-                var handler = Delegate.CreateDelegate(eventInfo.EventHandlerType!, this, methodInfo);
-
-                var addMethod = eventInfo.GetAddMethod(true);
-
-                addMethod?.Invoke(ToastService, new object[] { handler });
-            }
-        }
-
-        base.OnInitialized();
-    }
-
     protected override async Task OnAfterRenderAsync(bool firstRender)
     {
         if (firstRender)
         {
+            var toastServiceType = typeof(ToastService);
+
+            var eventInfo = toastServiceType.GetEvent("OnNotify", BindingFlags.NonPublic | BindingFlags.Instance);
+
+            if (eventInfo != null)
+            {
+                var methodInfo = GetType().GetMethod(nameof(OnNotifyHandler), BindingFlags.NonPublic | BindingFlags.Instance);
+
+                if (methodInfo != null)
+                {
+                    var handler = Delegate.CreateDelegate(eventInfo.EventHandlerType!, this, methodInfo);
+
+                    var addMethod = eventInfo.GetAddMethod(true);
+
+                    addMethod?.Invoke(ToastService, new object[] { handler });
+                }
+            }
+
             TimedToastMessages = await ToastStorageService.LoadToastMessages();
 
             StateHasChanged();
@@ -197,10 +194,12 @@
         await ToastStorageService.RemoveAllToastMessages();
     }
 
-    private async Task OnDismissSingleToastAsync(TimedToastMessage timedToastMessage) 
+    private async Task OnDismissSingleToastAsync(TimedToastMessage timedToastMessage)
     {
         TimedToastMessages.Remove(timedToastMessage);
 
         await ToastStorageService.RemoveToastMessage(timedToastMessage.Id);
     }
+
+    private async Task OnShowOffcanvasClick() => await offcanvas.ShowAsync();
 }
