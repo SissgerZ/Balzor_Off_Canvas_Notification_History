@@ -3,20 +3,38 @@
 
 @inherits LayoutComponentBase
 
-<div class="bb-page">
+<style>
+    .offcanvas-header {
+        display: unset;
+        padding: unset;
+    }
 
+    .offcanvas-body {
+        padding: unset;
+    }
+</style>
+
+<div class="bb-page">
     <main>
         <div class="bb-top-row px-4 d-flex justify-content-end">
             <Button Type="ButtonType.Button" Color="ButtonColor.Primary" Position="Position.Relative" @onclick="OnShowOffcanvasClick">
                 <Icon Name="IconName.BellFill"></Icon>
-                @if (TimedToastMessages.Count() != 0)
+                @if (TimedToastMessages.Count() > 0 && TimedToastMessages.Count() < 100)
                 {
                     <Badge Color="BadgeColor.Danger"
-                    Position="Position.Absolute"
-                    Placement="BadgePlacement.TopRight"
-                    IndicatorType="BadgeIndicatorType.RoundedPill"
-                    VisuallyHiddenText="unread messages">@TimedToastMessages.Count()</Badge>
-                }             
+                           Position="Position.Absolute"
+                           Placement="BadgePlacement.TopRight"
+                           IndicatorType="BadgeIndicatorType.RoundedPill"
+                           VisuallyHiddenText="unread messages">@TimedToastMessages.Count()</Badge>
+                }
+                else if (TimedToastMessages.Count() >= 100)
+                {
+                    <Badge Color="BadgeColor.Danger"
+                           Position="Position.Absolute"
+                           Placement="BadgePlacement.TopRight"
+                           IndicatorType="BadgeIndicatorType.RoundedPill"
+                           VisuallyHiddenText="unread messages">99+</Badge>
+                }
             </Button>
 
             <div class="pe-5"></div>
@@ -31,46 +49,51 @@
 
 </div>
 
-<style>
-    .offcanvas-header {
-        display: unset;
-        padding: unset;
-    }
-
-    .offcanvas-body {
-        padding: unset;
-    }
-</style>
-
 <Offcanvas @ref="offcanvas" ShowCloseButton="false" Size="OffcanvasSize.Regular">
-    <HeaderTemplate >
+    <HeaderTemplate>
         <div class="ps-3 pt-3 pe-3">
             <h4>Notifications</h4>
             <hr />
-        </div>      
+        </div>
     </HeaderTemplate>
     <BodyTemplate>
         <div class="ps-3 pt-1 pe-3">
-            <div class="toast-messages-container">
+            <div>
                 @if (TimedToastMessages.Any())
                 {
                     @foreach (var timedToastMessage in TimedToastMessages)
                     {
-                        <div class="toast-message">
-                            <small>@timedToastMessage.Occurrence</small>
-                            <br />
-                            <br />
-                            <Icon Name="@timedToastMessage.IconName" Color="timedToastMessage.IconColor"></Icon>
-                            <strong>@timedToastMessage.Title</strong>
-                            <p>@timedToastMessage.Message</p>
+                        <div class="row align-items-center pt-1">
+                            <div class="col">
+                                <small style="color: dimgrey;">@timedToastMessage.Occurrence</small>
+                            </div>
+                            <div class="col text-end">
+                                <Button Color="ButtonColor.Dark" @onclick="@(() => OnDismissSingleToast(timedToastMessage))">
+                                    <Icon Name="IconName.Trash"></Icon>
+                                </Button>
+                            </div>
+                        </div>
+
+                        <div class="row">
+                            <div class="col pt-2">
+                                <Icon Name="@timedToastMessage.IconName" Color="timedToastMessage.IconColor" />                               
+                                <strong>@timedToastMessage.Title</strong>
+                            </div>
+                        </div>
+
+                        <div class="row">
+                            <div class="col">
+                                <p>@timedToastMessage.Message</p>
+                            </div>
                         </div>
 
                         <hr />
+
                     }
                 }
                 else
                 {
-                    <p>No toast messages available.</p>
+                    <p>Currently there is no notifications available.</p>
                 }
             </div>
 
@@ -83,11 +106,13 @@
                     </Button>
                 </div>
             }
-        </div>      
+        </div>
     </BodyTemplate>
 </Offcanvas>
 
-<Toasts Class="p-3" AutoHide="true" Delay="5000" Placement="ToastsPlacement.TopRight" StackLength="5" ShowCloseButton="false" />
+<Toasts Class="p-3" AutoHide="true" Delay="4000" Placement="ToastsPlacement.TopRight" StackLength="5" ShowCloseButton="true" />
+
+<ThemeSwitcher />
 
 @code {
     [Inject] protected ToastService ToastService { get; set; } = default!;
@@ -99,6 +124,8 @@
     private async Task OnShowOffcanvasClick() => await offcanvas.ShowAsync();
 
     private void OnDismissAllToasts() => TimedToastMessages = [];
+
+    private void OnDismissSingleToast(TimedToastMessage timedToastMessage) => TimedToastMessages.Remove(timedToastMessage);
 
     protected override void OnInitialized()
     {
