@@ -17,6 +17,14 @@
     .progress {
         display: none;
     }
+
+    .offcanvas {
+        z-index: 1200;
+    }
+
+    .toast {
+        background-color: rgba(var(--bs-body-bg-rgb), 1);
+    }
 </style>
 
 <div class="bb-page">
@@ -98,13 +106,22 @@
                 }
                 else
                 {
-                    <p>Currently there is no notifications available.</p>
+                    <div class="pt-5 mt-5 d-flex flex-column text-center">
+                        <div class="pt-5 mt-5">
+                            <div class="pt-5 mt-5">
+                                <div class="pt-4 mt-4" style="color: dimgray;">
+                                    <Icon Name="IconName.Inbox" Size="IconSize.x1"></Icon>
+                                    <p>No notifications to display</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
                 }
             </div>
 
             @if (TimedToastMessages.Any())
             {
-                <div class="pt-2 pb-4">
+                <div class="pt-4 pb-4">
                     <Button Color="ButtonColor.Primary" @onclick="async () => await OnDismissAllToastsAsync()">
                         <Icon Name="IconName.Trash"></Icon>
                         Dismiss All
