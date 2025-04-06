@@ -1,4 +1,6 @@
 ﻿using BlazorBootstrap;
+using Microsoft.AspNetCore.Components;
+using System.Text.Json.Serialization;
 
 namespace Balzor_Off_Canvas_Notification_History.Models;
 
@@ -7,6 +9,17 @@ public class TimedToastMessage : ToastMessage
     public DateTime Occurrence { get; set; }
 
     public IconColor IconColor { get; set; }
+
+    public new Guid Id { get; set; }
+
+    // pevent serialization issues with json ignore
+    [JsonIgnore]
+    public new RenderFragment? Content { get; set; }
+
+    public TimedToastMessage()
+    {
+        // required for deserialization
+    }
 
     public TimedToastMessage(ToastMessage toastMessage,
                              IconColor iconColor,
@@ -21,21 +34,19 @@ public class TimedToastMessage : ToastMessage
         Title = toastMessage.Title;
         Type = toastMessage.Type;
 
+        Occurrence = occurrence;
+        IconColor = iconColor;
+
         try
         {
             var toastMessageType = typeof(ToastMessage);
-            var elementIdProp = toastMessageType.GetProperty("ElementId", System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Instance);
             var idField = toastMessageType.GetField("Id", System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Instance);
 
-            elementIdProp?.SetValue(this, elementIdProp.GetValue(toastMessage));
-            idField?.SetValue(this, idField.GetValue(toastMessage));
+            Id = idField?.GetValue(toastMessage) as Guid? ?? Guid.NewGuid();
         }
         catch
         {
             // intentionally ignored
         }
-
-        Occurrence = occurrence;
-        IconColor = iconColor;
     }
 }
