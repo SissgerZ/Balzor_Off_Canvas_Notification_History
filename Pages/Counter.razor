@@ -4,15 +4,51 @@
 
 <h1>Counter</h1>
 
-<p role="status">Current count: @currentCount</p>
+<p> Counter page content is shown </p>
 
-<button class="btn btn-primary" @onclick="IncrementCount">Click me</button>
+<Button Type="ButtonType.Button" Color="ButtonColor.Primary" @onclick="SaveEmployee">
+    Test
+</Button>
+
+<br/>
+<br/>
+
+<NavLink class="nav-link" href="/">
+    <span class="oi oi-plus" aria-hidden="true"></span> Go to Index page
+</NavLink>
 
 @code {
-    private int currentCount = 0;
 
-    private void IncrementCount()
+    [Inject] protected ToastService ToastService { get; set; } = default!;
+
+    private void SaveEmployee()
     {
-        currentCount++;
+        try
+        {
+
+            ToastService.Notify(new ToastMessage(type: ToastType.Success,
+                                                 title: "Something happend",
+                                                 message: $"Employee details saved successfully with a very long message.",
+                                                 iconName: IconName.CheckCircleFill,
+                                                 helpText: DateTime.UtcNow.ToString()));
+
+            ToastService.Notify(new ToastMessage(type: ToastType.Warning,
+                                                 title: "Something happend",
+                                                 message: $"Employee details saved successfully with a very long message.",
+                                                 iconName: IconName.LightbulbFill,
+                                                 helpText: DateTime.UtcNow.ToString()));
+
+            ToastService.Notify(new ToastMessage(type: ToastType.Danger,
+                                                 title: "Something happend",
+                                                 message: $"Employee details saved successfully with a very long message.",
+                                                 iconName: IconName.ExclamationTriangleFill,
+                                                 helpText: DateTime.UtcNow.ToString()));
+        }
+        catch (Exception ex)
+        {
+            // handle exception
+
+            ToastService.Notify(new(ToastType.Danger, $"Error: {ex.Message}."));
+        }
     }
 }
