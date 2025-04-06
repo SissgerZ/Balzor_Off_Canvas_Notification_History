@@ -1,21 +1,45 @@
 ﻿@page "/counter"
 
+<style>
+    .background-container {
+        position: relative;
+        width: 100%;
+        height: 100%;
+        /* background-color: rgba(0, 0, 0, 0.8); /* Background color */ */
+    }
+
+        .background-container::after {
+            content: "";
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: url('windows_xp_bliss.jpg') no-repeat center;
+            opacity: 0.2; /* Adjust image opacity */
+            pointer-events: none; /* Allows clicks to pass through */
+        }
+</style>
+
 <PageTitle>Counter</PageTitle>
 
-<h1>Counter</h1>
 
-<p> Counter page content is shown </p>
+<div class="background-container">
+    <h1>Counter</h1>
 
-<Button Type="ButtonType.Button" Color="ButtonColor.Primary" @onclick="SaveEmployee">
-    Test
-</Button>
+    <p> Counter page content is shown </p>
 
-<br/>
-<br/>
+    <Button Type="ButtonType.Button" Color="ButtonColor.Primary" @onclick="SaveEmployee">
+        Test
+    </Button>
 
-<NavLink class="nav-link" href="/">
-    <span class="oi oi-plus" aria-hidden="true"></span> Go to Index page
-</NavLink>
+    <br />
+    <br />
+
+    <NavLink class="nav-link" href="/">
+        <span class="oi oi-plus" aria-hidden="true"></span> Go to Index page
+    </NavLink>
+</div>
 
 @code {
 
